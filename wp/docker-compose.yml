@@ -1,0 +1,53 @@
+version: '3.7'
+
+services:
+
+  wordpress:
+    image: wordpress:${WORDPRESS_TAG}
+    restart: always
+    ports:
+      - 80:80
+    environment:
+      WORDPRESS_DB_HOST: mysql_db
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: 1111
+      WORDPRESS_DB_NAME: wpdb
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      - db_network
+      - fe_network
+    healthcheck:
+       test: ["CMD", "curl", "-f", "http://localhost"]
+       interval: 1m30s
+       timeout: 10s
+       retries: 3
+       start_period: 40s
+
+  mysql_db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: wpdb
+      MYSQL_USER: wpuser
+      MYSQL_PASSWORD: 1111
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+    networks:
+      - db_network
+        #    healthcheck:
+        #      test: ["CMD", "STAT=$$(netstat -nlpt | grep 3306 | wc -l);","if [[ $STAT -ge 1 ]]", "then echo 'done!' && exit 0", "else echo 'not yet' && exit 1", "fi"]
+        #      interval: 1m30s
+        #      timeout: 10s
+        #      retries: 3
+        #      start_period: 40s
+
+volumes:
+  wordpress:
+  db:
+
+
+networks:
+  db_network:
+  fe_network:

@@ -1,0 +1,45 @@
+version: '3.7'
+
+services:
+
+  wordpress:
+    image: wordpress
+    build:
+      context: https://github.com/docker-library/wordpress.git
+      dockerfile: php7.4/apache/Dockerfile
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_VERSION: 5.3
+      WORDPRESS_DB_HOST: mysql_db
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: 1111
+      WORDPRESS_DB_NAME: wpdb
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      - db_network
+      - fe_network
+
+
+
+  mysql_db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: wpdb
+      MYSQL_USER: wpuser
+      MYSQL_PASSWORD: 1111
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  wordpress:
+  db:
+
+
+networks:
+  db_network:
+  fe_network:
